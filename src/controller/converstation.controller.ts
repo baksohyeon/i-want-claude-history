@@ -18,7 +18,6 @@ export class ConversationController {
     request: Request,
     response: Response
   ): Promise<any> {
-    console.log({ key: process.env.ANTHROPIC_API_KEY });
     this.conversationService = new ConversationService(chatUrl);
     const anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
@@ -26,8 +25,9 @@ export class ConversationController {
 
     if (anthropic) {
       console.log(`anthropic is initiallized`);
-      console.table(anthropic);
     }
+
+    anthropic.authToken = "test-if-any-string-is-exist-then-continue";
 
     // try {
     //   console.debug("line 41");
