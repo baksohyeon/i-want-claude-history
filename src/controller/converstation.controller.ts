@@ -2,6 +2,8 @@ import { ConversationService } from "../service/conversation.service";
 import { Conversation } from "../model/conversation.interface";
 import Anthropic from "@anthropic-ai/sdk";
 import { Request, Response } from "express";
+import fs from "fs";
+
 require("dotenv").config();
 
 export class ConversationController {
@@ -17,29 +19,18 @@ export class ConversationController {
     response: Response
   ): Promise<any> {
     console.log({ key: process.env.ANTHROPIC_API_KEY });
+    this.conversationService = new ConversationService(chatUrl);
     const anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
 
-    // BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Claude API. Please go to Plans & Billing to upgrade or purchase credits."}}
-    try {
-      const msg = await anthropic.messages
-        .stream({
-          model: "claude-3-opus-20240229",
-          max_tokens: 1024,
-          system: "task",
-          messages: [{ role: "user", content: "task" }],
-        })
-        .on("finalMessage", (message) => {
-          console.log(message);
-        });
-
-      return "msg";
-    } catch (e) {
-      console.log(e);
+    if (anthropic) {
+      console.log(`anthropic is initiallized`);
+      console.table(anthropic);
     }
 
     // try {
+    //   console.debug("line 41");
     //   if ("content" in response && Array.isArray(response["content"])) {
     //     // 각 TextBlock에서 텍스트 추출
     //     const formattedOutput: string = response["content"]
@@ -60,18 +51,18 @@ export class ConversationController {
     //   console.log("An error occurred:", e.message);
     // }
 
-    // const conversationId = chatUrl.split("/").pop();
-    // if (!conversationId) {
-    //   throw new Error("대화 ID를 추출할 수 없습니다.");
-    // }
-    // console.log(msg);
+    const conversationId = chatUrl.split("/").pop();
+    if (!conversationId) {
+      throw new Error("대화 ID를 추출할 수 없습니다.");
+    }
 
-    // this.conversationService = new ConversationService(chatUrl);
-    // console.log(chatUrl);
-    // const conversations = await this.conversationService.fetchConversations();
-    // console.log({ conversations });
-    // return conversations;
-    return "test";
+    console.log(chatUrl);
+    const conversations = await this.conversationService.fetchConversations(
+      anthropic
+    );
+    console.log({ conversations });
+    return conversations;
+    // return "test";
   }
 
   generateMarkdownFile(conversation: Conversation, fileName: string): void {

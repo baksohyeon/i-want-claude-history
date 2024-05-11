@@ -11,13 +11,20 @@ app.use(cookieParser());
 app.use(express.json());
 const conversationController = new ConversationController();
 
+app.use((req, res, next) => {
+  console.debug(
+    `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`
+  );
+  next();
+});
+
 app.get("/api/conversations", (req: express.Request, res: express.Response) => {
   conversationController.fetchConversations(
     req.query.chatUrl as string,
     req,
     res
   );
-  console.log("ok");
+  console.log("api ok");
 });
 
 app.listen(port, () => {
