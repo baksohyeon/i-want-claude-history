@@ -8,15 +8,18 @@ const port = 3000;
 
 app.use(express.static(path.join(__dirname, "../src/public")));
 app.use(cookieParser());
-
+app.use(express.json());
 const conversationController = new ConversationController();
 
 app.get("/api/conversations", (req: express.Request, res: express.Response) => {
-  conversationController.fetchConversations(req.query.chatUrl as string);
+  conversationController.fetchConversations(
+    req.query.chatUrl as string,
+    req,
+    res
+  );
   console.log("ok");
 });
 
 app.listen(port, () => {
-  console.log({ route: path.join(__dirname, "../public") });
   console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
 });
